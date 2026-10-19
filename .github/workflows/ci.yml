@@ -1,3 +1,4 @@
+# test comment
 name: Foundations
 on:
   pull_request:
@@ -20,6 +21,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+      
+      - name: Pause for cancellation
+        run: sleep 30
+        
       - id: meta
         env:
           REVISION: ${{ github.sha }}
@@ -29,7 +34,7 @@ jobs:
           echo "revision=$REVISION" >> "$GITHUB_OUTPUT"
       - run: echo 'The first job passed' >> "$GITHUB_STEP_SUMMARY"
   matrix:
-    needs: greet
+    needs: greets
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     strategy:
