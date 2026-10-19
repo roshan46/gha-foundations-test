@@ -34,7 +34,7 @@ jobs:
           echo "revision=$REVISION" >> "$GITHUB_OUTPUT"
       - run: echo 'The first job passed' >> "$GITHUB_STEP_SUMMARY"
   matrix:
-    needs: greet
+    needs: greets
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     strategy:
