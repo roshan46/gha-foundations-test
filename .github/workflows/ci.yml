@@ -1,0 +1,44 @@
+name: Foundations
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: foundations-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  greet:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      revision: ${{ steps.meta.outputs.revision }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - id: meta
+        env:
+          REVISION: ${{ github.sha }}
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          printf 'Revision: %s; PR title: %s\n' "$REVISION" "$TITLE"
+          echo "revision=$REVISION" >> "$GITHUB_OUTPUT"
+      - run: echo 'The first job passed' >> "$GITHUB_STEP_SUMMARY"
+  matrix:
+    needs: greet
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        sample: [unit, integration]
+    steps:
+      - env:
+          SAMPLE: ${{ matrix.sample }}
+          REVISION: ${{ needs.greet.outputs.revision }}
+        run: printf 'Check %s on %s\n' "$SAMPLE" "$REVISION"
